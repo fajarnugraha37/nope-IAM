@@ -33,7 +33,7 @@ writeFileSync(jsonPath, JSON.stringify(data, null, 2));
 const adapter = new JSONFileAdapter({
     filePath: jsonPath,
 });
-const iam = new IAM({ storage: adapter, evaluator: defaultPolicyEvaluator });
+const iam = new IAM({ storage: adapter, evaluatorFunc: defaultPolicyEvaluator });
 
 async function main() {
   const user: User = { id: 'u1', roleIds: ['r1'], policyIds: [] };

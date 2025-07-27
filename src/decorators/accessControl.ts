@@ -1,34 +1,112 @@
-/**
- * TypeScript decorator for access control (skeleton)
- * @packageDocumentation
- */
-
 import type { CanParams } from '../core/iam';
 import { IAM } from '../core/iam';
 
 /**
- * Method decorator to allow if user can perform any of the listed actions on the resource.
- * @param actions - Array of actions
- * @param resource - Resource string
+ * Method decorator to log access attempts, decisions, and context for auditing.
+ * Logs to iam.config.logger if available, otherwise console.
+ * @param opts - Optional: logLevel (default 'info'), custom message, or function to format log
  */
-export function AllowActions(actions: string[], resource: string): MethodDecorator {
-  return AccessControl((...args: any[]) => ({ action: actions[0], resource })); // Only checks first action for now
+export function LogAccess(opts?: {
+  logLevel?: 'info' | 'warn',
+  message?: string | ((ctx: any) => string)
+}): MethodDecorator {
+  return (target, propertyKey, descriptor: PropertyDescriptor) => {
+    const original = descriptor.value;
+    descriptor.value = async function (this: any, ...args: any[]) {
+      // Prefer this.logger, then this.iam.logger, then console
+      const logger = this?.logger || this?.iam?.logger || console;
+      let result: any = undefined;
+      let error: any = undefined;
+      try {
+        result = await original.apply(this, args);
+        if (logger) {
+          const ctx = {
+            user: this.user,
+            args,
+            result,
+            method: typeof propertyKey === 'symbol' ? propertyKey.toString() : String(propertyKey),
+            class: target.constructor?.name,
+          };
+          let msg = opts?.message;
+          if (typeof msg === 'function') msg = msg(ctx);
+          if (!msg) msg = `Access attempt: user=${ctx.user?.id}, method=${ctx.method}, result=${JSON.stringify(result)}`;
+          if (typeof logger[opts?.logLevel || 'info'] === 'function') {
+            logger[opts?.logLevel || 'info'](msg, ctx);
+          } else {
+            console.log(msg, ctx);
+          }
+        }
+        return result;
+      } catch (err) {
+        error = err;
+        if (logger) {
+          const ctx = {
+            user: this.user,
+            args,
+            error,
+            method: typeof propertyKey === 'symbol' ? propertyKey.toString() : String(propertyKey),
+            class: target.constructor?.name,
+          };
+          let msg = opts?.message;
+          if (typeof msg === 'function') msg = msg(ctx);
+          if (!msg) msg = `Access denied: user=${ctx.user?.id}, method=${ctx.method}, error=${error?.message}`;
+          if (typeof logger[opts?.logLevel || 'warn'] === 'function') {
+            logger[opts?.logLevel || 'warn'](msg, ctx);
+          } else {
+            console.warn(msg, ctx);
+          }
+        }
+        throw err;
+      }
+    };
+    return descriptor;
+  };
 }
 
+
 /**
- * Method decorator to deny if user can perform any of the listed actions (explicit deny logic).
+ * Method decorator to allow if user can perform any of the listed actions on any of the listed resources.
  * @param actions - Array of actions
- * @param resource - Resource string
+ * @param resources - Resource string or array of resource strings
  */
-export function DenyActions(actions: string[], resource: string): MethodDecorator {
+export function AllowActions(actions: string[], resources: string | string[]): MethodDecorator {
   return (target, propertyKey, descriptor: PropertyDescriptor) => {
     const original = descriptor.value;
     descriptor.value = async function (this: any, ...args: any[]) {
       const iam: IAM = this?.iam || (global as any).iam;
       if (!iam) throw new Error('IAM instance not found');
+      const resourceList = Array.isArray(resources) ? resources : [resources];
       for (const action of actions) {
-        const result = await iam.can({ user: this.user, action, resource });
-        if (result.decision) throw new Error('Access denied: explicitly denied action');
+        for (const resource of resourceList) {
+          const result = await iam.can({ user: this.user, action, resource });
+          if (result.decision) {
+            return original.apply(this, args);
+          }
+        }
+      }
+      throw new Error('Access denied: none of the actions/resources allowed');
+    };
+    return descriptor;
+  };
+}
+
+/**
+ * Method decorator to deny if user can perform any of the listed actions on any of the listed resources (explicit deny logic).
+ * @param actions - Array of actions
+ * @param resources - Resource string or array of resource strings
+ */
+export function DenyActions(actions: string[], resources: string | string[]): MethodDecorator {
+  return (target, propertyKey, descriptor: PropertyDescriptor) => {
+    const original = descriptor.value;
+    descriptor.value = async function (this: any, ...args: any[]) {
+      const iam: IAM = this?.iam || (global as any).iam;
+      if (!iam) throw new Error('IAM instance not found');
+      const resourceList = Array.isArray(resources) ? resources : [resources];
+      for (const action of actions) {
+        for (const resource of resourceList) {
+          const result = await iam.can({ user: this.user, action, resource });
+          if (result.decision) throw new Error('Access denied: explicitly denied action');
+        }
       }
       return original.apply(this, args);
     };
