@@ -35,7 +35,7 @@ jobs:
       - name: Publish to npm
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: pnpm publish --provenance --access public
+        run: pnpm publish --no-git-checks --provenance --access public
 
       - name: Post-publish info
         run: echo "Published to npm as ${{ github.ref_name }}"
