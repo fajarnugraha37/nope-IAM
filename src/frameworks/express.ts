@@ -18,12 +18,10 @@ export function iamExpressMiddleware(iam: IAM) {
       const resource = (req as any).resource || req.path;
       const context = (req as any).context || {};
       if (!user) {
-        console.error('User not found in request');
         return res.status(401).json({ error: 'User not found' });
       }
       const result = await iam.can({ user, action, resource, context });
       if (!result.decision) {
-        console.error('Access denied', { user, action, resource, context });
         return res.status(403).json({ error: 'Access denied', trace: result.trace });
       }
       next();
