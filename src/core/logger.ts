@@ -1,3 +1,5 @@
+import fs from 'fs';
+
 /**
  * Logger interface for pluggable logging
  * @public
@@ -87,9 +89,8 @@ export function loadIAMConfig(options?: { file?: string } | { env?: Record<strin
     } else if ('file' in options) {
       try {
         // eslint-disable-next-line @typescript-eslint/no-var-requires
-        const fs = require('fs');
-        if (fs.existsSync(options.file)) {
-          const raw = fs.readFileSync(options.file, 'utf-8');
+        if (fs.existsSync(options.file!)) {
+          const raw = fs.readFileSync(options.file!, 'utf-8');
           const parsed = JSON.parse(raw);
           if (parsed.logLevel) config.logLevel = parsed.logLevel;
           // Add more config parsing as needed

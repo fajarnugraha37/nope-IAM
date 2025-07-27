@@ -1,4 +1,5 @@
-import { DefaultLogger, LogLevel, ILogger, loadIAMConfig } from '../src/core/logger';
+import { DefaultLogger, loadIAMConfig } from '../src/core/logger';
+import fs from 'fs';
 
 describe('DefaultLogger', () => {
   it('should log at info level and above by default', () => {
@@ -87,7 +88,6 @@ describe('loadIAMConfig', () => {
   });
 
   it('should load logLevel from file', () => {
-    const fs = require('fs');
     const tmpFile = './tmp-iam-config.json';
     fs.writeFileSync(tmpFile, JSON.stringify({ logLevel: 'error' }));
     const config = loadIAMConfig({ file: tmpFile });

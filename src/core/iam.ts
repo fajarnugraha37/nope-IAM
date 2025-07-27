@@ -9,6 +9,7 @@ import type { IAMStorage } from "./storage.js";
 import type { PolicyEvaluator } from "./evaluator.js";
 import type { ILogger, IAMConfig, LogLevel } from "./logger.js";
 import { defaultPolicyEvaluator } from "./defaultEvaluator.js";
+import { DefaultLogger } from './logger.js';
 
 export interface CanParams<
   Action = string,
@@ -77,7 +78,6 @@ export class IAM {
       this.logger = logger;
     } else {
       // Lazy import to avoid circular deps
-      const { DefaultLogger } = require('./logger');
       this.logger = new DefaultLogger(logLevel || 'info');
     }
     this.evaluator = options && options?.evaluatorFunc && options.evaluatorFunc(this.logger);
