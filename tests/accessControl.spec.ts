@@ -33,7 +33,7 @@ describe('AccessControl decorator', () => {
       user = user;
       // @ts-expect-error
       @AccessControl({ action: 'read', resource: 'doc:1' })
-      async foo() { return 'ok'; }
+      async foo(): Promise<any> { return 'ok'; }
     }
     const t = new Test();
     // Remove global.iam if set
@@ -53,7 +53,7 @@ describe('AccessControl decorator', () => {
       user = user;
       // @ts-expect-error
       @AccessControl({ action: 'read', resource: 'doc:1' })
-      async foo() { return 'ok'; }
+      async foo(): Promise<any> { return 'ok'; }
     }
     const t = new Test();
     await expect(t.foo()).resolves.toBe('ok');
@@ -65,7 +65,7 @@ describe('AccessControl decorator', () => {
       user = user;
       // @ts-expect-error
       @AccessControl({ action: 'write', resource: 'doc:1' })
-      async foo() { return 'fail'; }
+      async foo(): Promise<any> { return 'fail'; }
     }
     const t = new Test();
     await expect(t.foo()).rejects.toThrow('Access denied');
@@ -77,7 +77,7 @@ describe('AccessControl decorator', () => {
       user = user;
       // @ts-expect-error
       @AccessControl((action: string) => ({ action, resource: 'doc:1' }))
-      async foo(action: string) { return action; }
+      async foo(action: string): Promise<any> { return action; }
     }
     const t = new Test();
     await expect(t.foo('read')).resolves.toBe('read');
