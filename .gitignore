@@ -22,5 +22,5 @@ Thumbs.db
 *.cache
 # Ignore test output
 *.test-results.json
-.github
+.github/**/*.md
 coverage/
