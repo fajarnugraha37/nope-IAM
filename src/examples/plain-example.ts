@@ -6,6 +6,7 @@ import { IAM } from '../core/iam';
 import { InMemoryAdapter } from '../adapters/inMemoryAdapter';
 import { defaultPolicyEvaluator } from '../core/defaultEvaluator';
 import type { User, Role, Policy } from '../types/entities';
+import { defaultConditionOperators } from '../core/evaluator';
 
 // Define a policy allowing read access to resource 'doc:1'
 const policy: Policy = {
@@ -48,6 +49,39 @@ async function main() {
   const denied = await iam.can({ user, action: 'write', resource: 'doc:1' });
   console.log('Decision:', denied.decision); // false
   console.log('Trace:', denied.trace);
+
+  // --- Demonstrate all new operators ---
+  const context = {
+    num: 10,
+    str: 'hello world',
+    arr: [1, 2, 3],
+    regexStr: 'abc123',
+  };
+
+  const operators = defaultConditionOperators;
+
+  // eq
+  console.log('eq:', operators.eq('num', 10, context)); // true
+  // ne
+  console.log('ne:', operators.ne('num', 5, context)); // true
+  // gt
+  console.log('gt:', operators.gt('num', 5, context)); // true
+  // lt
+  console.log('lt:', operators.lt('num', 20, context)); // true
+  // gte
+  console.log('gte:', operators.gte('num', 10, context)); // true
+  // lte
+  console.log('lte:', operators.lte('num', 10, context)); // true
+  // in
+  console.log('in:', operators.in('num', [5, 10, 15], context)); // true
+  // contains (string)
+  console.log('contains (string):', operators.contains('str', 'world', context)); // true
+  // contains (array)
+  console.log('contains (array):', operators.contains('arr', 2, context)); // true
+  // regex (RegExp)
+  console.log('regex (RegExp):', operators.regex('regexStr', /^abc\d+$/, context)); // true
+  // regex (string)
+  console.log('regex (string):', operators.regex('regexStr', 'abc', context)); // true
 }
 
 main().catch(console.error);

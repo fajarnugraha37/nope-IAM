@@ -38,8 +38,27 @@ export class ConditionOperatorRegistry {
  */
 export const defaultConditionOperators: Record<string, ConditionOperator> = {
   eq: (key, value, context) => context[key] === value,
+  ne: (key, value, context) => context[key] !== value,
+  gt: (key, value, context) => typeof context[key] === 'number' && typeof value === 'number' && context[key] > value,
+  lt: (key, value, context) => typeof context[key] === 'number' && typeof value === 'number' && context[key] < value,
+  gte: (key, value, context) => typeof context[key] === 'number' && typeof value === 'number' && context[key] >= value,
+  lte: (key, value, context) => typeof context[key] === 'number' && typeof value === 'number' && context[key] <= value,
   in: (key, value, context) => Array.isArray(value) && value.includes(context[key]),
-  // Add more as needed
+  contains: (key, value, context) => {
+    const v = context[key];
+    if (typeof v === 'string') return v.includes(String(value));
+    if (Array.isArray(v)) return v.includes(value);
+    return false;
+  },
+  regex: (key, value, context) => {
+    try {
+      const re = typeof value === 'string' ? new RegExp(value) : value;
+      if (!(re instanceof RegExp)) return false;
+      return typeof context[key] === 'string' && re.test(context[key] as string);
+    } catch {
+      return false;
+    }
+  },
 };
 /**
  * Extensible policy evaluation logic for IAM
