@@ -2,6 +2,7 @@
  * Unit tests for defaultPolicyEvaluator (IAM core)
  */
 import { defaultPolicyEvaluator } from '../src/core/defaultEvaluator';
+import { DefaultLogger } from '../src/core/logger';
 import type { User, Role, Policy } from '../src/types/entities';
 import { defaultConditionOperators } from '../src/core/evaluator';
 
@@ -22,9 +23,11 @@ describe('defaultPolicyEvaluator', () => {
       { effect: 'Deny', actions: ['write'], resources: ['doc:1'] },
     ],
   };
+  const logger = new DefaultLogger('debug');
+  const evaluator = defaultPolicyEvaluator(logger);
 
   it('should allow when user or role policy allows', async () => {
-    const result = await defaultPolicyEvaluator(
+    const result = await evaluator(
       user,
       'read',
       'doc:1',
@@ -39,7 +42,7 @@ describe('defaultPolicyEvaluator', () => {
   });
 
   it('should deny when no policy matches', async () => {
-    const result = await defaultPolicyEvaluator(
+    const result = await evaluator(
       user,
       'delete',
       'doc:1',
@@ -53,7 +56,7 @@ describe('defaultPolicyEvaluator', () => {
   });
 
   it('should deny when explicit deny policy matches', async () => {
-    const result = await defaultPolicyEvaluator(
+    const result = await evaluator(
       user,
       'write',
       'doc:1',
@@ -80,7 +83,7 @@ describe('defaultPolicyEvaluator', () => {
       ],
     };
     const ctx = { owner: 'u1' };
-    const result = await defaultPolicyEvaluator(
+    const result = await evaluator(
       user,
       'read',
       'doc:2',
@@ -106,7 +109,7 @@ describe('defaultPolicyEvaluator', () => {
       ],
     };
     const ctx = { owner: 'u2' };
-    const result = await defaultPolicyEvaluator(
+    const result = await evaluator(
       user,
       'read',
       'doc:2',
@@ -132,7 +135,7 @@ describe('defaultPolicyEvaluator', () => {
         },
       ],
     };
-    const result = await defaultPolicyEvaluator(
+    const result = await evaluator(
       user,
       'read',
       'doc:3',

@@ -4,6 +4,7 @@
 import { IAM } from '../src/core/iam';
 import { InMemoryAdapter } from '../src/adapters/inMemoryAdapter';
 import { defaultPolicyEvaluator } from '../src/core/defaultEvaluator';
+import { DefaultLogger } from '../src/core/logger';
 import { User, Role, Policy } from '../src/types/entities';
 import { AccessControl } from '../src/decorators/accessControl';
 import { iamExpressMiddleware } from '../src/frameworks/express';
@@ -33,7 +34,8 @@ const policy: Policy = {
   ],
 };
 const adapter = new InMemoryAdapter({ users: [user], roles: [role], policies: [policy] });
-const iam = new IAM({ storage: adapter, evaluator: defaultPolicyEvaluator });
+const logger = new DefaultLogger('debug');
+const iam = new IAM({ storage: adapter, evaluatorFunc: defaultPolicyEvaluator, config: { logger, logLevel: 'debug' } });
 
 describe('AccessControl decorator', () => {
   it('should allow decorated method when access is granted', async () => {

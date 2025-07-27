@@ -4,6 +4,7 @@
 import { IAM } from "../src/core/iam";
 import { InMemoryAdapter } from "../src/adapters/inMemoryAdapter";
 import { defaultPolicyEvaluator } from "../src/core/defaultEvaluator";
+import { DefaultLogger } from "../src/core/logger";
 import { User, Role, Policy } from "../src/types/entities";
 
 import { JSONFileAdapter } from "../src/adapters/jsonFileAdapter";
@@ -34,9 +35,11 @@ describe("IAM core and adapters", () => {
       roles: [role],
       policies: [policy],
     });
+    const logger = new DefaultLogger('debug');
     const iam = new IAM({
       storage: adapter,
-      evaluator: defaultPolicyEvaluator,
+      evaluatorFunc: defaultPolicyEvaluator,
+      config: { logger, logLevel: 'debug' },
     });
 
     it("should allow access when policy allows", async () => {
@@ -90,7 +93,8 @@ describe("IAM core and adapters", () => {
         )
       );
       adapter = new JSONFileAdapter({ filePath: tmpPath });
-      iam = new IAM({ storage: adapter, evaluator: defaultPolicyEvaluator });
+      const logger = new DefaultLogger('debug');
+      iam = new IAM({ storage: adapter, evaluatorFunc: defaultPolicyEvaluator, config: { logger, logLevel: 'debug' } });
     });
     afterAll(async () => {
       await fs.unlink(tmpPath).catch(() => {});
@@ -126,15 +130,17 @@ describe("IAM core and adapters", () => {
 
   describe("Edge cases and errors", () => {
     it("should not fail if hooks are not provided", async () => {
-      const adapter = new InMemoryAdapter({ users: [user], roles: [role], policies: [policy] });
-      const iam = new IAM({ storage: adapter, evaluator: defaultPolicyEvaluator });
+  const adapter = new InMemoryAdapter({ users: [user], roles: [role], policies: [policy] });
+  const logger = new DefaultLogger('debug');
+  const iam = new IAM({ storage: adapter, evaluatorFunc: defaultPolicyEvaluator, config: { logger, logLevel: 'debug' } });
       const result = await iam.can({ user, action: "read", resource: "doc:1" });
       expect(result.decision).toBe(true);
     });
 
     it("should handle missing context gracefully", async () => {
       const adapter = new InMemoryAdapter({ users: [user], roles: [role], policies: [policy] });
-      const iam = new IAM({ storage: adapter, evaluator: defaultPolicyEvaluator });
+      const logger = new DefaultLogger('debug');
+      const iam = new IAM({ storage: adapter, evaluatorFunc: defaultPolicyEvaluator, config: { logger, logLevel: 'debug' } });
       const result = await iam.can({ user, action: "read", resource: "doc:1" });
       expect(result.decision).toBe(true);
     });
@@ -143,7 +149,8 @@ describe("IAM core and adapters", () => {
       const userNoRoles: User = { id: "u5", roleIds: [], policyIds: [] };
       const adapter = new InMemoryAdapter({ users: [userNoRoles], roles: [], policies: [] });
       const onRoleNotFound = jest.fn();
-      const iam = new IAM({ storage: adapter, evaluator: defaultPolicyEvaluator, hooks: { onRoleNotFound } });
+      const logger = new DefaultLogger('debug');
+      const iam = new IAM({ storage: adapter, evaluatorFunc: defaultPolicyEvaluator, config: { logger, logLevel: 'debug' }, hooks: { onRoleNotFound } });
       await iam.can({ user: userNoRoles, action: "read", resource: "doc:1" });
       expect(onRoleNotFound).toHaveBeenCalledWith(null);
     });
@@ -152,7 +159,8 @@ describe("IAM core and adapters", () => {
       const userMultiMissing: User = { id: "u6", roleIds: ["rX", "rY"], policyIds: [] };
       const adapter = new InMemoryAdapter({ users: [userMultiMissing], roles: [], policies: [] });
       const onRoleNotFound = jest.fn();
-      const iam = new IAM({ storage: adapter, evaluator: defaultPolicyEvaluator, hooks: { onRoleNotFound } });
+      const logger = new DefaultLogger('debug');
+      const iam = new IAM({ storage: adapter, evaluatorFunc: defaultPolicyEvaluator, config: { logger, logLevel: 'debug' }, hooks: { onRoleNotFound } });
       await iam.can({ user: userMultiMissing, action: "read", resource: "doc:1" });
       expect(onRoleNotFound).toHaveBeenCalledWith("rX");
       expect(onRoleNotFound).toHaveBeenCalledWith("rY");
@@ -161,7 +169,8 @@ describe("IAM core and adapters", () => {
     it("should handle error thrown in onAfterDecision hook gracefully", async () => {
       const adapter = new InMemoryAdapter({ users: [user], roles: [role], policies: [policy] });
       const onAfterDecision = jest.fn(() => { throw new Error("after fail"); });
-      const iam = new IAM({ storage: adapter, evaluator: defaultPolicyEvaluator, hooks: { onAfterDecision } });
+      const logger = new DefaultLogger('debug');
+      const iam = new IAM({ storage: adapter, evaluatorFunc: defaultPolicyEvaluator, config: { logger, logLevel: 'debug' }, hooks: { onAfterDecision } });
       const result = await iam.can({ user, action: "read", resource: "doc:1" });
       expect(result.decision).toBe(true);
     });
@@ -170,9 +179,11 @@ describe("IAM core and adapters", () => {
       const calls: string[] = [];
       const onBeforeDecision = jest.fn<any, any>(() => calls.push('before'));
       const onAfterDecision = jest.fn<any, any>(() => calls.push('after'));
+      const logger = new DefaultLogger('debug');
       const iam = new IAM({
         storage: adapter,
-        evaluator: defaultPolicyEvaluator,
+        evaluatorFunc: defaultPolicyEvaluator,
+        config: { logger, logLevel: 'debug' },
         hooks: { onBeforeDecision, onAfterDecision },
       });
       await iam.can({ user, action: "read", resource: "doc:1" });
@@ -200,9 +211,11 @@ describe("IAM core and adapters", () => {
       const condUser: User = { id: "u4", roleIds: [], policyIds: ["p2"] };
       const adapter = new InMemoryAdapter({ users: [condUser], roles: [], policies: [condPolicy] });
       const onConditionCheck = jest.fn();
+      const logger = new DefaultLogger('debug');
       const iam = new IAM({
         storage: adapter,
-        evaluator: defaultPolicyEvaluator,
+        evaluatorFunc: defaultPolicyEvaluator,
+        config: { logger, logLevel: 'debug' },
         hooks: { onConditionCheck: (op, key, value, context, result) => {
             onConditionCheck(op, key, value, context, result);
         } },
@@ -214,9 +227,11 @@ describe("IAM core and adapters", () => {
     it("should call onStorageAccess before and after storage method", async () => {
       const adapter = new InMemoryAdapter({ users: [user], roles: [role], policies: [policy] });
       const onStorageAccess = jest.fn();
+      const logger = new DefaultLogger('debug');
       const iam = new IAM({
         storage: adapter,
-        evaluator: defaultPolicyEvaluator,
+        evaluatorFunc: defaultPolicyEvaluator,
+        config: { logger, logLevel: 'debug' },
         hooks: { onStorageAccess },
       });
       await iam.can({ user, action: "read", resource: "doc:1" });
@@ -239,9 +254,11 @@ describe("IAM core and adapters", () => {
       // The policy is attached to the missing role, but the role itself is not present
       const onRoleNotFound = jest.fn();
       const adapter = new InMemoryAdapter({ users: [missingRoleUser], roles: [], policies: [missingRolePolicy] });
+      const logger = new DefaultLogger('debug');
       const iam = new IAM({
         storage: adapter,
-        evaluator: defaultPolicyEvaluator,
+        evaluatorFunc: defaultPolicyEvaluator,
+        config: { logger, logLevel: 'debug' },
         hooks: { onRoleNotFound },
       });
       await iam.can({ user: missingRoleUser, action: "read", resource: "doc:1" });
@@ -261,9 +278,11 @@ describe("IAM core and adapters", () => {
         policies: [],
       });
       const onDecision = jest.fn();
+      const logger = new DefaultLogger('debug');
       const iam = new IAM({
         storage: adapter,
-        evaluator: defaultPolicyEvaluator,
+        evaluatorFunc: defaultPolicyEvaluator,
+        config: { logger, logLevel: 'debug' },
         hooks: { onDecision },
       });
       await iam.can({ user, action: "read", resource: "doc:1" });
@@ -286,9 +305,11 @@ describe("IAM core and adapters", () => {
       const onDecision = jest.fn().mockImplementation(() => {
         throw new Error("hook fail");
       });
+      const logger = new DefaultLogger('debug');
       const iam = new IAM({
         storage: adapter,
-        evaluator: defaultPolicyEvaluator,
+        evaluatorFunc: defaultPolicyEvaluator,
+        config: { logger, logLevel: 'debug' },
         hooks: { onDecision },
       });
       const result = await iam.can({ user, action: "read", resource: "doc:1" });

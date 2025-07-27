@@ -5,6 +5,7 @@ import { serverlessHandler } from '../src/frameworks/serverless';
 import { IAM } from '../src/core/iam';
 import { InMemoryAdapter } from '../src/adapters/inMemoryAdapter';
 import { defaultPolicyEvaluator } from '../src/core/defaultEvaluator';
+import { DefaultLogger } from '../src/core/logger';
 import type { User, Role, Policy } from '../src/types/entities';
 
 describe('serverlessHandler', () => {
@@ -18,7 +19,8 @@ describe('serverlessHandler', () => {
     ],
   };
   const adapter = new InMemoryAdapter({ users: [user], roles: [role], policies: [policy] });
-  const iam = new IAM({ storage: adapter, evaluator: defaultPolicyEvaluator });
+  const logger = new DefaultLogger('debug');
+  const iam = new IAM({ storage: adapter, evaluatorFunc: defaultPolicyEvaluator, config: { logger, logLevel: 'debug' } });
 
   it('should resolve if access allowed', async () => {
     await expect(serverlessHandler(iam, { user, action: 'read', resource: 'doc:1', context: {} }, {})).resolves.toBeUndefined();

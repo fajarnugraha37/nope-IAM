@@ -37,7 +37,14 @@ const user: User = {
 
 // Set up the IAM engine with in-memory storage
 const adapter = new InMemoryAdapter({ users: [user], roles: [role], policies: [policy] });
-const iam = new IAM({ storage: adapter, evaluator: defaultPolicyEvaluator });
+// Set up the IAM engine with in-memory storage and centralized logger
+import { DefaultLogger } from '../core/logger';
+const logger = new DefaultLogger('debug');
+const iam = new IAM({
+  storage: adapter,
+  evaluatorFunc: defaultPolicyEvaluator,
+  config: { logger, logLevel: 'debug' },
+});
 
 async function main() {
   // Evaluate access for the user
