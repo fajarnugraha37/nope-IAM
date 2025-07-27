@@ -8,6 +8,9 @@ on:
 jobs:
   publish:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -23,19 +26,16 @@ jobs:
         with:
           version: 9
 
-
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-
 
       - name: Build
         run: pnpm run build
 
-
       - name: Publish to npm
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: pnpm publish --access public
+        run: pnpm publish --provenance --access public
 
       - name: Post-publish info
         run: echo "Published to npm as ${{ github.ref_name }}"
