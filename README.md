@@ -22,7 +22,7 @@ Supports policies, roles, decorators, adapters, and rich evaluation context beca
 - **Asynchronous evaluation**: Promise-based, always
 - **Rich decision context**: Not just boolean, but evaluation trace, matched policy/statement, etc.
 - **Decorators**: For route/method-level access control, with parameterized and composable support (so you can blame the decorator)
-- **Framework adapters**: Express, Hono, Fastify, NestJS, event-driven, serverless, and whatever's trendy next week
+- **Agnostic**: Express, Hono, Fastify, NestJS, event-driven, serverless, and whatever's trendy next week
 - **Role assignment utilities**: Assign/unassign roles to users
 - **Serialization**: Import/export policies, roles, etc.
 - **Logging & auditing**: Pluggable logger, `@LogAccess` decorator
@@ -131,9 +131,8 @@ console.log(result.decision); // true
 
 ---
 
-## Decorators & Framework Integration
+## Decorators 
 - Use `@AccessControl`, `@RequireRole`, `@RequirePolicy`, `@AllowActions`, `@DenyActions`, `@AccessCondition`, `@LogAccess` on methods
-- Integrate with Express, Hono, Fastify, NestJS, serverless, and event-driven systems
 
 ---
 
@@ -166,7 +165,6 @@ console.log(result.decision); // true
 - [x] **Policy, Role, User Model**: AWS IAM-inspired, with flat roles and explicit policy attachment
 - [x] **In-Memory & JSON Adapters**: Pluggable storage, ready for custom and RDBMS adapters
 - [x] **Rich Decorator Suite**: `@AccessControl`, `@RequireRole`, `@RequirePolicy`, `@AllowActions`, `@DenyActions`, `@AccessCondition`, `@LogAccess`
-- [x] **Framework Integrations**: Express, Hono, Fastify, NestJS, serverless, event-driven
 - [x] **Role Assignment Utilities**: Assign/unassign roles to users
 - [x] **Serialization**: Import/export for policies, roles, etc.
 - [x] **Pluggable Logger & Config**: Centralized, extensible logging and configuration
@@ -183,7 +181,6 @@ console.log(result.decision); // true
 - [ ] **Audit/Event Hooks**: Webhooks, event emitters, or analytics integrations
 - [ ] **Localization/Internationalization**: Error messages and docs in multiple languages
 - [ ] **CLI Tooling**: Policy validation, import/export, and migration via CLI
-- [ ] **More Framework Adapters**: Koa, AWS Lambda, Azure Functions, etc.
 - [ ] **Security Hardening**: Static analysis, fuzzing, and advanced threat modeling
 - [ ] **Community Plugins**: Registry for custom adapters, evaluators, and decorators
 - [ ] **Policy Simulation/Preview**: Simulate policy changes and preview their effects before applying
@@ -204,10 +201,8 @@ console.log(result.decision); // true
 │   ├── core/           # IAM engine, evaluators, logger, storage
 │   ├── adapters/       # In-memory, JSON
 │   ├── decorators/     # Access control decorators
-│   ├── frameworks/     # Express, Fastify, Hono, NestJS, serverless, event-driven
 │   ├── types/          # Entities, decision context, etc.
-│   ├── utils/          # Role assignment, serialization
-│   └── examples/       # Usage examples for all frameworks
+│   └── utils/          # Role assignment, serialization
 ├── tests/              # Unit tests
 ├── coverage/           # Coverage reports
 ├── dist/               # Build output

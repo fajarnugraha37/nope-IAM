@@ -14,13 +14,6 @@ export * from './core/storage.js';
 
 export * from './decorators/accessControl.js';
 
-export * from './frameworks/eventDriven.js';
-export * from './frameworks/express.js';
-export * from './frameworks/fastify.js';
-export * from './frameworks/hono.js';
-export * from './frameworks/nestjs.js';
-export * from './frameworks/serverless.js';
-
 export * from './types/decision.js';
 export * from './types/entities.js';
 
