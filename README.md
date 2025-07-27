@@ -1,4 +1,10 @@
+
 # NopeIAM
+
+[![npm version](https://img.shields.io/npm/v/@fajarnugraha37/nope-iam.svg?style=flat-square)](https://www.npmjs.com/package/@fajarnugraha37/nope-iam)
+[![MIT License](https://img.shields.io/badge/license-MIT-green.svg?style=flat-square)](LICENSE)
+
+**NPM Package:** [@fajarnugraha37/nope-iam](https://www.npmjs.com/package/@fajarnugraha37/nope-iam)
 
 <p>
 A highly extensible, type-safe IAM-like access control library for Node.js, inspired by AWS IAM. 
