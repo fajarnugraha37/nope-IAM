@@ -2,7 +2,7 @@
  * Decision context and evaluation trace
  * @packageDocumentation
  */
-import type { Policy, Statement } from './entities.js';
+import type { Policy, Statement } from "./entities.js";
 
 export interface EvaluationTrace<Action = string, Resource = string> {
   checkedPolicies: string[];

@@ -3,7 +3,7 @@
  * @template User, Role, Policy
  * @packageDocumentation
  */
-import type { User, Role, Policy } from '../types/entities.js';
+import type { User, Role, Policy } from "../types/entities.js";
 
 /**
  * Extensible async storage interface for IAM entities.

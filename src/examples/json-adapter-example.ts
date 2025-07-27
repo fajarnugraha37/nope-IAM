@@ -2,41 +2,40 @@
  * Example: Using the JSONFileAdapter for IAM
  * Demonstrates loading and saving IAM entities from a JSON file
  */
-import { defaultPolicyEvaluator, IAM, JSONFileAdapter } from '../index.js';
-import type { User } from '../index.js';
-import { writeFileSync } from 'fs';
-import { join } from 'path';
+import { defaultPolicyEvaluator, IAM, JSONFileAdapter } from "../index.js";
+import type { User } from "../index.js";
+import { writeFileSync } from "fs";
+import { join } from "path";
 
 // Prepare a JSON file with initial data
 const data = {
-  users: [
-    { id: 'u1', roleIds: ['r1'], policyIds: [] },
-  ],
-  roles: [
-    { id: 'r1', name: 'reader', policyIds: ['p1'] },
-  ],
+  users: [{ id: "u1", roleIds: ["r1"], policyIds: [] }],
+  roles: [{ id: "r1", name: "reader", policyIds: ["p1"] }],
   policies: [
     {
-      id: 'p1',
-      name: 'AllowRead',
+      id: "p1",
+      name: "AllowRead",
       statements: [
-        { effect: 'Allow', actions: ['read'], resources: ['doc:1'] },
+        { effect: "Allow", actions: ["read"], resources: ["doc:1"] },
       ],
     },
   ],
 };
-const jsonPath = join(__dirname, 'iam-data.json');
+const jsonPath = join(__dirname, "iam-data.json");
 writeFileSync(jsonPath, JSON.stringify(data, null, 2));
 
 const adapter = new JSONFileAdapter({
-    filePath: jsonPath,
+  filePath: jsonPath,
 });
-const iam = new IAM({ storage: adapter, evaluatorFunc: defaultPolicyEvaluator });
+const iam = new IAM({
+  storage: adapter,
+  evaluatorFunc: defaultPolicyEvaluator,
+});
 
 async function main() {
-  const user: User = { id: 'u1', roleIds: ['r1'], policyIds: [] };
-  const result = await iam.can({ user, action: 'read', resource: 'doc:1' });
-  console.log('JSONFileAdapter: Decision:', result.decision); // true
+  const user: User = { id: "u1", roleIds: ["r1"], policyIds: [] };
+  const result = await iam.can({ user, action: "read", resource: "doc:1" });
+  console.log("JSONFileAdapter: Decision:", result.decision); // true
 }
 
 main().catch(console.error);

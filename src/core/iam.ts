@@ -9,7 +9,7 @@ import type { IAMStorage } from "./storage.js";
 import type { PolicyEvaluator } from "./evaluator.js";
 import type { ILogger, IAMConfig, LogLevel } from "./logger.js";
 import { defaultPolicyEvaluator } from "./defaultEvaluator.js";
-import { DefaultLogger } from './logger.js';
+import { DefaultLogger } from "./logger.js";
 
 export interface CanParams<
   Action = string,
@@ -31,16 +31,33 @@ export interface IAMOptions {
   config?: IAMConfig;
   hooks?: {
     /** Called before evaluation starts */
-    onBeforeDecision?: <Action, Resource>(params: CanParams<Action, Resource, any>) => void | Promise<void>;
+    onBeforeDecision?: <Action, Resource>(
+      params: CanParams<Action, Resource, any>
+    ) => void | Promise<void>;
     /** Called after evaluation completes (success or error) */
-    onAfterDecision?: <Action, Resource>(ctx: DecisionContext<Action, Resource> | undefined, err: unknown | undefined) => void | Promise<void>;
+    onAfterDecision?: <Action, Resource>(
+      ctx: DecisionContext<Action, Resource> | undefined,
+      err: unknown | undefined
+    ) => void | Promise<void>;
     /** Called when a condition operator is checked */
-    onConditionCheck?: (operator: string, key: string, value: unknown, context: Record<string, unknown>, result: boolean) => void | Promise<void>;
+    onConditionCheck?: (
+      operator: string,
+      key: string,
+      value: unknown,
+      context: Record<string, unknown>,
+      result: boolean
+    ) => void | Promise<void>;
     /** Called before/after storage access */
-    onStorageAccess?: (method: string, args: unknown[], result?: unknown) => void | Promise<void>;
+    onStorageAccess?: (
+      method: string,
+      args: unknown[],
+      result?: unknown
+    ) => void | Promise<void>;
     /** Called if a referenced role is not found */
     onRoleNotFound?: (roleId: string | null) => void | Promise<void>;
-    onDecision?: <Action, Resource>(ctx: DecisionContext<Action, Resource>) => void | Promise<void>;
+    onDecision?: <Action, Resource>(
+      ctx: DecisionContext<Action, Resource>
+    ) => void | Promise<void>;
     onError?: (err: unknown) => void | Promise<void>;
   };
 }
@@ -56,7 +73,7 @@ export class IAM {
   /** Storage adapter for IAM entities */
   private storage?: IAMStorage;
   /** Custom policy evaluator */
-  private evaluator?: PolicyEvaluator;
+  private evaluator: PolicyEvaluator;
   /** Optional hooks for logging, auditing, etc. */
   private hooks?: IAMOptions["hooks"];
   /** Logger instance */
@@ -78,9 +95,13 @@ export class IAM {
       this.logger = logger;
     } else {
       // Lazy import to avoid circular deps
-      this.logger = new DefaultLogger(logLevel || 'info');
+      this.logger = new DefaultLogger(logLevel || "info");
     }
-    this.evaluator = options && options?.evaluatorFunc && options.evaluatorFunc(this.logger);
+    this.evaluator =
+      (options &&
+        options?.evaluatorFunc &&
+        options.evaluatorFunc(this.logger)) ||
+      defaultPolicyEvaluator(this.logger);
   }
 
   /**
@@ -103,19 +124,21 @@ export class IAM {
     let result: DecisionContext<string, string> | undefined = undefined;
     let error: unknown = undefined;
     try {
-      this.logger.debug('IAM.can called', params);
-      if (this.hooks?.onBeforeDecision) await this.hooks.onBeforeDecision(params);
+      this.logger.debug("IAM.can called", params);
+      if (this.hooks?.onBeforeDecision)
+        await this.hooks.onBeforeDecision(params);
       if (!this.storage) {
-        this.logger.error('No storage adapter configured');
+        this.logger.error("No storage adapter configured");
         throw new Error("No storage adapter configured");
       }
       const user = params.user;
       // Storage access with hook and logging
       const callStorage = async (method: keyof IAMStorage, ...args: any[]) => {
         this.logger.debug(`Storage access: ${String(method)}`, ...args);
-        if (this.hooks?.onStorageAccess) await this.hooks.onStorageAccess(method as string, args);
+        if (this.hooks?.onStorageAccess) {
+            await this.hooks.onStorageAccess(method as string, args);
+        }
         const res = await (this.storage as any)[method](...args);
-        if (this.hooks?.onStorageAccess) await this.hooks.onStorageAccess(method as string, args, res);
         this.logger.debug(`Storage result: ${String(method)}`, res);
         return res;
       };
@@ -127,17 +150,17 @@ export class IAM {
       // User/role not found hooks
       if (this.hooks?.onRoleNotFound) {
         if (params.user.roleIds.length === 0) {
-          this.logger.warn('User has no roles', params.user.id);
+          this.logger.warn("User has no roles", params.user.id);
           await this.hooks.onRoleNotFound(null);
         } else if (userRoles == undefined || userRoles.length === 0) {
-          for(const rid of user.roleIds) {
-            this.logger.warn('Role not found', rid);
+          for (const rid of user.roleIds) {
+            this.logger.warn("Role not found", rid);
             await this.hooks.onRoleNotFound(rid);
           }
         } else if (userRoles.some((r: Role | undefined) => !r)) {
           for (const rid of user.roleIds) {
             if (!userRoles.find((r: Role | undefined) => r && r.id === rid)) {
-              this.logger.warn('Role not found', rid);
+              this.logger.warn("Role not found", rid);
               await this.hooks.onRoleNotFound(rid);
             }
           }
@@ -147,10 +170,9 @@ export class IAM {
       const rolePolicyIds = userRoles.flatMap((r: Role) => r.policyIds);
       const rolePolicies = await callStorage("getPolicies", rolePolicyIds);
       const allPolicies = [...userPolicies, ...rolePolicies];
-      // Use custom or default evaluator
-      const evaluator = this.evaluator ?? defaultPolicyEvaluator(this.logger);
       // Patch operators to call onConditionCheck and log
-      const operatorsRaw = (await import("./evaluator.js")).defaultConditionOperators;
+      const operatorsRaw = (await import("./evaluator.js"))
+        .defaultConditionOperators;
       const operators: typeof operatorsRaw = { ...operatorsRaw };
       if (this.hooks?.onConditionCheck) {
         for (const [name, op] of Object.entries(operatorsRaw)) {
@@ -162,7 +184,7 @@ export class IAM {
           };
         }
       }
-      result = await evaluator(
+      result = await this.evaluator(
         user,
         params.action,
         params.resource,
@@ -171,12 +193,12 @@ export class IAM {
         userRoles,
         operators
       );
-      this.logger.info('IAM decision', result);
+      this.logger.info("IAM decision", result);
       if (this.hooks?.onDecision) await this.hooks.onDecision(result);
       return result;
     } catch (err) {
       error = err;
-      this.logger.error('IAM error', err);
+      this.logger.error("IAM error", err);
       if (this.hooks?.onError) await this.hooks.onError(err);
       return {
         decision: false,

@@ -1,4 +1,4 @@
-import fs from 'fs';
+import fs from "fs";
 
 /**
  * Logger interface for pluggable logging
@@ -24,29 +24,45 @@ export interface ILogger {
  * - 'none': No logs
  * @public
  */
-export type LogLevel = 'debug' | 'info' | 'warn' | 'error' | 'none';
+export type LogLevel = "debug" | "info" | "warn" | "error" | "none";
 
 /**
  * Default simple logger (console-based, respects log level)
  * @public
  */
 export class DefaultLogger implements ILogger {
-  constructor(private level: LogLevel = 'info') {}
+  constructor(private level: LogLevel = "info") {
+    this.info = this.shouldLog("info")
+        ? (message: string, ...meta: unknown[]) => console.info("[IAM][INFO]", message, ...meta)
+        : () => {/** no-op */};
+    this.warn = this.shouldLog("warn")
+        ? (message: string, ...meta: unknown[]) => console.warn("[IAM][WARN]", message, ...meta)
+        : () => {/** no-op */};
+    this.error = this.shouldLog("error")
+        ? (message: string, ...meta: unknown[]) => console.error("[IAM][ERROR]", message, ...meta)
+        : () => {/** no-op */};
+    this.debug = this.shouldLog("debug")
+        ? (message: string, ...meta: unknown[]) => console.debug("[IAM][DEBUG]", message, ...meta)
+        : () => {/** no-op */};
+  }
+
   private shouldLog(lvl: LogLevel) {
-    const order = ['debug', 'info', 'warn', 'error'];
-    return this.level !== 'none' && order.indexOf(lvl) >= order.indexOf(this.level);
+    const order = ["debug", "info", "warn", "error"];
+    return (
+      this.level !== "none" && order.indexOf(lvl) >= order.indexOf(this.level)
+    );
   }
+
   info(message: string, ...meta: unknown[]) {
-    if (this.shouldLog('info')) console.info('[IAM][INFO]', message, ...meta);
   }
+  
   warn(message: string, ...meta: unknown[]) {
-    if (this.shouldLog('warn')) console.warn('[IAM][WARN]', message, ...meta);
   }
+  
   error(message: string, ...meta: unknown[]) {
-    if (this.shouldLog('error')) console.error('[IAM][ERROR]', message, ...meta);
   }
+  
   debug(message: string, ...meta: unknown[]) {
-    if (this.shouldLog('debug')) console.debug('[IAM][DEBUG]', message, ...meta);
   }
 }
 
@@ -76,7 +92,9 @@ export interface IAMConfig {
  * // Loads config from a specific file
  * const config = loadIAMConfig({ file: './my-iam-config.yaml' });
  */
-export function loadIAMConfig(options?: { file?: string } | { env?: Record<string, unknown> }): Partial<IAMConfig> {
+export function loadIAMConfig(
+  options?: { file?: string } | { env?: Record<string, unknown> }
+): Partial<IAMConfig> {
   // Minimal implementation: loads from process.env and optionally a JSON file
   const config: Partial<IAMConfig> = {};
   if (process.env.IAM_LOG_LEVEL) {
@@ -84,13 +102,13 @@ export function loadIAMConfig(options?: { file?: string } | { env?: Record<strin
   }
   // Optionally load from file (JSON only for now)
   if (options) {
-    if ('env' in options) {
+    if ("env" in options) {
       Object.assign(config, options.env);
-    } else if ('file' in options) {
+    } else if ("file" in options) {
       try {
         // eslint-disable-next-line @typescript-eslint/no-var-requires
         if (fs.existsSync(options.file!)) {
-          const raw = fs.readFileSync(options.file!, 'utf-8');
+          const raw = fs.readFileSync(options.file!, "utf-8");
           const parsed = JSON.parse(raw);
           if (parsed.logLevel) config.logLevel = parsed.logLevel;
           // Add more config parsing as needed
