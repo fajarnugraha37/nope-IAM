@@ -125,6 +125,128 @@ describe("IAM core and adapters", () => {
   });
 
   describe("Edge cases and errors", () => {
+    it("should not fail if hooks are not provided", async () => {
+      const adapter = new InMemoryAdapter({ users: [user], roles: [role], policies: [policy] });
+      const iam = new IAM({ storage: adapter, evaluator: defaultPolicyEvaluator });
+      const result = await iam.can({ user, action: "read", resource: "doc:1" });
+      expect(result.decision).toBe(true);
+    });
+
+    it("should handle missing context gracefully", async () => {
+      const adapter = new InMemoryAdapter({ users: [user], roles: [role], policies: [policy] });
+      const iam = new IAM({ storage: adapter, evaluator: defaultPolicyEvaluator });
+      const result = await iam.can({ user, action: "read", resource: "doc:1" });
+      expect(result.decision).toBe(true);
+    });
+
+    it("should call onRoleNotFound with null if user has no roles", async () => {
+      const userNoRoles: User = { id: "u5", roleIds: [], policyIds: [] };
+      const adapter = new InMemoryAdapter({ users: [userNoRoles], roles: [], policies: [] });
+      const onRoleNotFound = jest.fn();
+      const iam = new IAM({ storage: adapter, evaluator: defaultPolicyEvaluator, hooks: { onRoleNotFound } });
+      await iam.can({ user: userNoRoles, action: "read", resource: "doc:1" });
+      expect(onRoleNotFound).toHaveBeenCalledWith(null);
+    });
+
+    it("should call onRoleNotFound for all missing roles if user has multiple missing roles", async () => {
+      const userMultiMissing: User = { id: "u6", roleIds: ["rX", "rY"], policyIds: [] };
+      const adapter = new InMemoryAdapter({ users: [userMultiMissing], roles: [], policies: [] });
+      const onRoleNotFound = jest.fn();
+      const iam = new IAM({ storage: adapter, evaluator: defaultPolicyEvaluator, hooks: { onRoleNotFound } });
+      await iam.can({ user: userMultiMissing, action: "read", resource: "doc:1" });
+      expect(onRoleNotFound).toHaveBeenCalledWith("rX");
+      expect(onRoleNotFound).toHaveBeenCalledWith("rY");
+    });
+
+    it("should handle error thrown in onAfterDecision hook gracefully", async () => {
+      const adapter = new InMemoryAdapter({ users: [user], roles: [role], policies: [policy] });
+      const onAfterDecision = jest.fn(() => { throw new Error("after fail"); });
+      const iam = new IAM({ storage: adapter, evaluator: defaultPolicyEvaluator, hooks: { onAfterDecision } });
+      const result = await iam.can({ user, action: "read", resource: "doc:1" });
+      expect(result.decision).toBe(true);
+    });
+    it("should call onBeforeDecision and onAfterDecision hooks", async () => {
+      const adapter = new InMemoryAdapter({ users: [user], roles: [role], policies: [policy] });
+      const calls: string[] = [];
+      const onBeforeDecision = jest.fn<any, any>(() => calls.push('before'));
+      const onAfterDecision = jest.fn<any, any>(() => calls.push('after'));
+      const iam = new IAM({
+        storage: adapter,
+        evaluator: defaultPolicyEvaluator,
+        hooks: { onBeforeDecision, onAfterDecision },
+      });
+      await iam.can({ user, action: "read", resource: "doc:1" });
+      expect(onBeforeDecision).toHaveBeenCalled();
+      expect(onAfterDecision).toHaveBeenCalled();
+      expect(calls).toEqual(['before', 'after']);
+    });
+
+    it("should call onConditionCheck for each operator used", async () => {
+      // Use a policy with a condition to trigger the operator and ensure it matches
+      const condPolicy: Policy = {
+        id: "p2",
+        name: "AllowReadIfFoo",
+        statements: [
+          {
+            effect: "Allow",
+            actions: ["read"],
+            resources: ["doc:1"],
+            conditions: [
+              { operator: "eq", key: "foo", value: "bar" }
+            ],
+          },
+        ],
+      };
+      const condUser: User = { id: "u4", roleIds: [], policyIds: ["p2"] };
+      const adapter = new InMemoryAdapter({ users: [condUser], roles: [], policies: [condPolicy] });
+      const onConditionCheck = jest.fn();
+      const iam = new IAM({
+        storage: adapter,
+        evaluator: defaultPolicyEvaluator,
+        hooks: { onConditionCheck: (op, key, value, context, result) => {
+            onConditionCheck(op, key, value, context, result);
+        } },
+      });
+      const res = await iam.can({ user: condUser, action: "read", resource: "doc:1", context: { foo: "bar" } });
+      expect(onConditionCheck).toHaveBeenCalledWith('eq', 'foo', 'bar', expect.anything(), true);
+    });
+
+    it("should call onStorageAccess before and after storage method", async () => {
+      const adapter = new InMemoryAdapter({ users: [user], roles: [role], policies: [policy] });
+      const onStorageAccess = jest.fn();
+      const iam = new IAM({
+        storage: adapter,
+        evaluator: defaultPolicyEvaluator,
+        hooks: { onStorageAccess },
+      });
+      await iam.can({ user, action: "read", resource: "doc:1" });
+      // Should be called for getPolicies and getRoles (before and after)
+      expect(onStorageAccess).toHaveBeenCalledWith('getPolicies', expect.any(Array));
+      expect(onStorageAccess).toHaveBeenCalledWith('getRoles', expect.any(Array));
+      expect(onStorageAccess).toHaveBeenCalledWith('getPolicies', expect.any(Array), expect.anything());
+    });
+
+    it("should call onRoleNotFound if a referenced role is missing", async () => {
+      // Use a user referencing a missing role, and a policy attached to that role
+      const missingRoleUser: User = { id: "u3", roleIds: ["missingRole"], policyIds: [] };
+      const missingRolePolicy: Policy = {
+        id: "p3",
+        name: "AllowReadViaMissingRole",
+        statements: [
+          { effect: "Allow", actions: ["read"], resources: ["doc:1"] }
+        ],
+      };
+      // The policy is attached to the missing role, but the role itself is not present
+      const onRoleNotFound = jest.fn();
+      const adapter = new InMemoryAdapter({ users: [missingRoleUser], roles: [], policies: [missingRolePolicy] });
+      const iam = new IAM({
+        storage: adapter,
+        evaluator: defaultPolicyEvaluator,
+        hooks: { onRoleNotFound },
+      });
+      await iam.can({ user: missingRoleUser, action: "read", resource: "doc:1" });
+      expect(onRoleNotFound).toHaveBeenCalledWith('missingRole');
+    });
     it("should return false if no storage adapter is configured", async () => {
       const iam = new IAM();
       const result = await iam.can({ user, action: "read", resource: "doc:1" });
