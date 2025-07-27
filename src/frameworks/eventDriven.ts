@@ -2,8 +2,7 @@
  * Event-driven (RabbitMQ/Kafka) integration example (skeleton)
  * @packageDocumentation
  */
-
-import type { IAM } from '../core/iam';
+import type { IAM } from '../core/iam.js';
 
 /**
  * Event-driven handler for IAM access control

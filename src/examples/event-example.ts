@@ -1,7 +1,7 @@
 /**
  * Example: Event-driven (RabbitMQ/Kafka) integration with IAM
  */
-import { IAM, handleEvent, InMemoryAdapter } from '..';
+import { IAM, handleEvent, InMemoryAdapter } from '../index.js';
 
 const adapter = new InMemoryAdapter();
 const iam = new IAM();

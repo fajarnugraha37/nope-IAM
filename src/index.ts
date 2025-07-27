@@ -3,26 +3,26 @@
  * @packageDocumentation
  */
 
-export * from './adapters/inMemoryAdapter';
-export * from './adapters/jsonFileAdapter';
+export * from './adapters/inMemoryAdapter.js';
+export * from './adapters/jsonFileAdapter.js';
 
-export * from './core/defaultEvaluator';
-export * from './core/evaluator';
-export * from './core/iam';
-export * from './core/logger';
-export * from './core/storage';
+export * from './core/defaultEvaluator.js';
+export * from './core/evaluator.js';
+export * from './core/iam.js';
+export * from './core/logger.js';
+export * from './core/storage.js';
 
-export * from './decorators/accessControl';
+export * from './decorators/accessControl.js';
 
-export * from './frameworks/eventDriven';
-export * from './frameworks/express';
-export * from './frameworks/fastify';
-export * from './frameworks/hono';
-export * from './frameworks/nestjs';
-export * from './frameworks/serverless';
+export * from './frameworks/eventDriven.js';
+export * from './frameworks/express.js';
+export * from './frameworks/fastify.js';
+export * from './frameworks/hono.js';
+export * from './frameworks/nestjs.js';
+export * from './frameworks/serverless.js';
 
-export * from './types/decision';
-export * from './types/entities';
+export * from './types/decision.js';
+export * from './types/entities.js';
 
-export * from './utils/roleAssignment';
-export * from './utils/serialization';
+export * from './utils/roleAssignment.js';
+export * from './utils/serialization.js';

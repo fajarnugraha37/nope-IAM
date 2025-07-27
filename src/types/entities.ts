@@ -2,7 +2,6 @@
  * Core IAM entities and types
  * @packageDocumentation
  */
-
 export type Effect = 'Allow' | 'Deny';
 
 export interface Condition {

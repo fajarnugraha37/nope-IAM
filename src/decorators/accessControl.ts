@@ -1,5 +1,5 @@
-import type { CanParams } from '../core/iam';
-import { IAM } from '../core/iam';
+import type { CanParams } from '../core/iam.js';
+import { IAM } from '../core/iam.js';
 
 /**
  * Method decorator to log access attempts, decisions, and context for auditing.

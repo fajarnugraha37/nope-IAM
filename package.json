@@ -1,11 +1,12 @@
 {
   "name": "@fajarnugraha37/nope-iam",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "A highly extensible, type-safe IAM-like access control library for Node.js, inspired by AWS IAM. Deny by default, allow by vibes and less patience for your bad access patterns. Supports policies, roles, decorators, adapters, and rich evaluation context because you probably need it.",
   "repository": {
     "type": "git",
     "url": "https://github.com/fajarnugraha37/nope-IAM.git"
   },
+  "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [

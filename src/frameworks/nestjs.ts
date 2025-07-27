@@ -2,9 +2,8 @@
  * NestJS guard example (skeleton)
  * @packageDocumentation
  */
-
 import { type  CanActivate, type ExecutionContext, Injectable } from '@nestjs/common';
-import type { IAM } from '../core/iam';
+import type { IAM } from '../core/iam.js';
 
 @Injectable()
 export class IamGuard implements CanActivate {

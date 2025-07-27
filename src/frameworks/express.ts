@@ -2,9 +2,8 @@
  * Express middleware example (skeleton)
  * @packageDocumentation
  */
-
 import type { Request, Response, NextFunction } from 'express';
-import type { IAM } from '../core/iam';
+import type { IAM } from '../core/iam.js';
 
 /**
  * Express middleware for IAM access control

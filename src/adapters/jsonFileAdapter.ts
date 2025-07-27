@@ -2,9 +2,8 @@
  * JSON file storage adapter (skeleton)
  * @packageDocumentation
  */
-
-import type { User, Role, Policy } from '../types/entities';
-import type { IAMStorage } from '../core/storage';
+import type { User, Role, Policy } from '../types/entities.js';
+import type { IAMStorage } from '../core/storage.js';
 import { promises as fs } from 'fs';
 
 export interface JSONFileAdapterOptions {

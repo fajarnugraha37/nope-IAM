@@ -2,9 +2,8 @@
  * Hono middleware example (skeleton)
  * @packageDocumentation
  */
-
 import type { Context, Next } from 'hono';
-import type { IAM } from '../core/iam';
+import type { IAM } from '../core/iam.js';
 
 /**
  * Hono middleware for IAM access control

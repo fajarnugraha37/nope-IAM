@@ -1,10 +1,8 @@
 /**
  * Example: Using the InMemoryAdapter for IAM
  */
-import { IAM } from '../core/iam';
-import { InMemoryAdapter } from '../adapters/inMemoryAdapter';
-import { defaultPolicyEvaluator } from '../core/defaultEvaluator';
-import type { User, Role, Policy } from '../types/entities';
+import { IAM, InMemoryAdapter, defaultPolicyEvaluator } from '../index.js';
+import type { User, Role, Policy } from '../index.js';
 
 const policy: Policy = {
   id: 'p1',

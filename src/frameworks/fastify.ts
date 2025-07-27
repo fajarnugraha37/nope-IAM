@@ -2,9 +2,8 @@
  * Fastify plugin example (skeleton)
  * @packageDocumentation
  */
-
 import type { FastifyRequest, FastifyReply } from 'fastify';
-import type { IAM } from '../core/iam';
+import type { IAM } from '../core/iam.js';
 
 /**
  * Fastify onRequest hook for IAM access control

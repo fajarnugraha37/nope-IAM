@@ -2,7 +2,7 @@
  * Example: Fastify integration with IAM
  */
 import Fastify from 'fastify';
-import { IAM, iamFastifyHook, InMemoryAdapter } from '..';
+import { IAM, iamFastifyHook, InMemoryAdapter } from '../index.js';
 
 const fastify = Fastify();
 const adapter = new InMemoryAdapter();

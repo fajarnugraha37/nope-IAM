@@ -2,7 +2,7 @@
  * Example: Hono integration with IAM
  */
 import { Hono } from 'hono';
-import { IAM, iamHonoMiddleware, InMemoryAdapter } from '..';
+import { IAM, iamHonoMiddleware, InMemoryAdapter } from '../index.js';
 
 const app = new Hono();
 const adapter = new InMemoryAdapter();

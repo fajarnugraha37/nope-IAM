@@ -2,7 +2,7 @@
  * Serialization utilities for policies, roles, and users
  * @packageDocumentation
  */
-import type { User, Role, Policy } from '../types/entities';
+import type { User, Role, Policy } from '../types/entities.js';
 
 /**
  * Serialize a policy to JSON

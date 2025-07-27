@@ -2,7 +2,7 @@
  * Example: NestJS integration with IAM
  */
 import { Module, Controller, UseGuards, Get } from '@nestjs/common';
-import { IamGuard, IAM, InMemoryAdapter } from '..';
+import { IamGuard, IAM, InMemoryAdapter } from '../index.js';
 
 @Controller('resource')
 @UseGuards(IamGuard)

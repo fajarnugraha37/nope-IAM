@@ -2,11 +2,8 @@
  * Plain TypeScript usage example for the IAM library (no framework)
  * Demonstrates defining users, roles, policies, and evaluating access
  */
-import { IAM } from '../core/iam';
-import { InMemoryAdapter } from '../adapters/inMemoryAdapter';
-import { defaultPolicyEvaluator } from '../core/defaultEvaluator';
-import type { User, Role, Policy } from '../types/entities';
-import { defaultConditionOperators } from '../core/evaluator';
+import { DefaultLogger, IAM, InMemoryAdapter, defaultPolicyEvaluator, defaultConditionOperators } from '../index.js';
+import type { User, Role, Policy } from '../index.js';
 
 // Define a policy allowing read access to resource 'doc:1'
 const policy: Policy = {
@@ -38,7 +35,6 @@ const user: User = {
 // Set up the IAM engine with in-memory storage
 const adapter = new InMemoryAdapter({ users: [user], roles: [role], policies: [policy] });
 // Set up the IAM engine with in-memory storage and centralized logger
-import { DefaultLogger } from '../core/logger';
 const logger = new DefaultLogger('debug');
 const iam = new IAM({
   storage: adapter,

@@ -1,7 +1,7 @@
 /**
  * Example: Serverless handler integration with IAM
  */
-import { IAM, serverlessHandler, InMemoryAdapter } from '..';
+import { IAM, serverlessHandler, InMemoryAdapter } from '../index.js';
 
 const adapter = new InMemoryAdapter();
 const iam = new IAM();

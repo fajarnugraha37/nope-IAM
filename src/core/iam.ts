@@ -3,12 +3,12 @@
  * @packageDocumentation
  */
 
-import type { User, Role, Policy } from "../types/entities";
-import type { DecisionContext } from "../types/decision";
-import type { IAMStorage } from "./storage";
-import type { PolicyEvaluator } from "./evaluator";
-import type { ILogger, IAMConfig, LogLevel } from "./logger";
-import { defaultPolicyEvaluator } from "./defaultEvaluator";
+import type { User, Role, Policy } from "../types/entities.js";
+import type { DecisionContext } from "../types/decision.js";
+import type { IAMStorage } from "./storage.js";
+import type { PolicyEvaluator } from "./evaluator.js";
+import type { ILogger, IAMConfig, LogLevel } from "./logger.js";
+import { defaultPolicyEvaluator } from "./defaultEvaluator.js";
 
 export interface CanParams<
   Action = string,
@@ -150,7 +150,7 @@ export class IAM {
       // Use custom or default evaluator
       const evaluator = this.evaluator ?? defaultPolicyEvaluator(this.logger);
       // Patch operators to call onConditionCheck and log
-      const operatorsRaw = (await import("./evaluator")).defaultConditionOperators;
+      const operatorsRaw = (await import("./evaluator.js")).defaultConditionOperators;
       const operators: typeof operatorsRaw = { ...operatorsRaw };
       if (this.hooks?.onConditionCheck) {
         for (const [name, op] of Object.entries(operatorsRaw)) {

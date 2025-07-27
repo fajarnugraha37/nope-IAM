@@ -2,10 +2,8 @@
  * Example: Using the JSONFileAdapter for IAM
  * Demonstrates loading and saving IAM entities from a JSON file
  */
-import { IAM } from '../core/iam';
-import { JSONFileAdapter } from '../adapters/jsonFileAdapter';
-import { defaultPolicyEvaluator } from '../core/defaultEvaluator';
-import type { User, Role, Policy } from '../types/entities';
+import { defaultPolicyEvaluator, IAM, JSONFileAdapter } from '../index.js';
+import type { User } from '../index.js';
 import { writeFileSync } from 'fs';
 import { join } from 'path';
 

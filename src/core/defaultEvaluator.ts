@@ -2,11 +2,10 @@
  * Default policy evaluator for IAM
  * @packageDocumentation
  */
-import type { User, Role, Policy, Statement } from '../types/entities';
-import type { DecisionContext } from '../types/decision';
-import type { PolicyEvaluator, ConditionOperator } from './evaluator';
-import type { ILogger, LogLevel, IAMConfig } from '../core/logger';
-import { DefaultLogger } from '../core/logger';
+import type { Policy } from '../types/entities.js';
+import type { DecisionContext } from '../types/decision.js';
+import type { PolicyEvaluator } from './evaluator.js';
+import type { ILogger } from '../core/logger.js'; 
 
 /**
  * Default policy evaluation logic: allow/deny/conditions

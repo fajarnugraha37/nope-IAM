@@ -2,7 +2,7 @@
  * Example: Express integration with IAM
  */
 import express from 'express';
-import { IAM, iamExpressMiddleware, InMemoryAdapter } from '..';
+import { IAM, iamExpressMiddleware, InMemoryAdapter } from '../index.js';
 
 const app = express();
 const adapter = new InMemoryAdapter();

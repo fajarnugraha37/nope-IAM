@@ -64,8 +64,8 @@ export const defaultConditionOperators: Record<string, ConditionOperator> = {
  * Extensible policy evaluation logic for IAM
  * @packageDocumentation
  */
-import type { User, Role, Policy, Statement } from '../types/entities';
-import type { DecisionContext } from '../types/decision';
+import type { User, Role, Policy, Statement } from '../types/entities.js';
+import type { DecisionContext } from '../types/decision.js';
 
 /**
  * Custom condition operator interface

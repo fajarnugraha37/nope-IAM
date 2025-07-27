@@ -2,8 +2,7 @@
  * Serverless handler integration example (skeleton)
  * @packageDocumentation
  */
-
-import type { IAM } from '../core/iam';
+import type { IAM } from '../core/iam.js';
 
 /**
  * Serverless handler for IAM access control

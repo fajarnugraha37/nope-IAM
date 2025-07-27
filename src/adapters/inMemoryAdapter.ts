@@ -2,12 +2,10 @@
  * In-memory storage adapter
  * @packageDocumentation
  */
-
-
-import type { User, Role, Policy } from '../types/entities';
-import type { IAMStorage } from '../core/storage';
-import type { ILogger, LogLevel, IAMConfig } from '../core/logger';
-import { DefaultLogger } from '../core/logger';
+import type { User, Role, Policy } from '../types/entities.js';
+import type { IAMStorage } from '../core/storage.js';
+import type { ILogger, LogLevel, IAMConfig } from '../core/logger.js';
+import { DefaultLogger } from '../core/logger.js';
 
 export interface InMemoryAdapterOptions {
   users?: User[];
