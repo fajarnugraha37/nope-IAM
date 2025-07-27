@@ -2,7 +2,7 @@
  * Extensible policy evaluation logic for IAM
  * @packageDocumentation
  */
-import type { User, Role, Policy, Statement } from "../types/entities.js";
+import type { User, Role, Policy } from "../types/entities.js";
 import type { DecisionContext } from "../types/decision.js";
 
 /**

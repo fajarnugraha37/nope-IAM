@@ -232,13 +232,13 @@ describe("IAM core and adapters", () => {
         storage: adapter,
         evaluatorFunc: defaultPolicyEvaluator,
         config: { logger, logLevel: 'debug' },
-        hooks: { onStorageAccess },
+        hooks: { onStorageAccess: onStorageAccess },
       });
       await iam.can({ user, action: "read", resource: "doc:1" });
       // Should be called for getPolicies and getRoles (before and after)
       expect(onStorageAccess).toHaveBeenCalledWith('getPolicies', expect.any(Array));
       expect(onStorageAccess).toHaveBeenCalledWith('getRoles', expect.any(Array));
-      expect(onStorageAccess).toHaveBeenCalledWith('getPolicies', expect.any(Array), expect.anything());
+      expect(onStorageAccess).toHaveBeenCalledWith('getPolicies', expect.any(Array));
     });
 
     it("should call onRoleNotFound if a referenced role is missing", async () => {

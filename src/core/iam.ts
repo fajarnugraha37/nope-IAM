@@ -3,11 +3,14 @@
  * @packageDocumentation
  */
 
-import type { User, Role, Policy } from "../types/entities.js";
+import type { User, Role, Condition } from "../types/entities.js";
 import type { DecisionContext } from "../types/decision.js";
 import type { IAMStorage } from "./storage.js";
-import type { PolicyEvaluator } from "./evaluator.js";
-import type { ILogger, IAMConfig, LogLevel } from "./logger.js";
+import {
+  defaultConditionOperators,
+  type PolicyEvaluator,
+} from "./evaluator.js";
+import type { ILogger, IAMConfig } from "./logger.js";
 import { defaultPolicyEvaluator } from "./defaultEvaluator.js";
 import { DefaultLogger } from "./logger.js";
 
@@ -136,7 +139,7 @@ export class IAM {
       const callStorage = async (method: keyof IAMStorage, ...args: any[]) => {
         this.logger.debug(`Storage access: ${String(method)}`, ...args);
         if (this.hooks?.onStorageAccess) {
-            await this.hooks.onStorageAccess(method as string, args);
+          await this.hooks.onStorageAccess(method as string, args);
         }
         const res = await (this.storage as any)[method](...args);
         this.logger.debug(`Storage result: ${String(method)}`, res);
@@ -171,14 +174,24 @@ export class IAM {
       const rolePolicies = await callStorage("getPolicies", rolePolicyIds);
       const allPolicies = [...userPolicies, ...rolePolicies];
       // Patch operators to call onConditionCheck and log
-      const operatorsRaw = (await import("./evaluator.js"))
-        .defaultConditionOperators;
-      const operators: typeof operatorsRaw = { ...operatorsRaw };
+      const operators: typeof defaultConditionOperators = {
+        ...defaultConditionOperators,
+      };
       if (this.hooks?.onConditionCheck) {
-        for (const [name, op] of Object.entries(operatorsRaw)) {
-          operators[name] = async (key, value, ctx) => {
+        for (const [name, op] of Object.entries(defaultConditionOperators)) {
+          operators[name] = async (
+            key: string,
+            value: unknown,
+            ctx: Record<string, unknown>
+          ) => {
             const res = await op(key, value, ctx);
-            this.logger.debug(`ConditionCheck: ${name}`, key, value, ctx, res);
+            this.logger.debug(
+              `ConditionCheck: ${name}`,
+              key,
+              value,
+              ctx,
+              res
+            );
             await this.hooks!.onConditionCheck!(name, key, value, ctx, res);
             return res;
           };
