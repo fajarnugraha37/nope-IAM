@@ -1,23 +1,38 @@
 {
-  "compilerOptions": {
-    "skipLibCheck": true,
-    "module": "ESNext",
-    "moduleResolution": "bundler",
-    "target": "ESNext",
-    "isolatedModules": true,
-    "esModuleInterop": true,
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
-    "noEmit": true,
-    "allowImportingTsExtensions": true,
-    "outDir": "dist",
-    "lib": [ "esnext" ],
-    "types": [ "node" ],
-    "baseUrl": "./",
-  },
-  "exclude": [ "node_modules" ],
-  "include": [
-    "src/**/*.ts",
-    "bin/*.ts"
-  ]
+    "compilerOptions": {
+        "target": "esnext",
+        "module": "esnext",
+        "moduleResolution": "node",
+        "outDir": "dist",
+        "baseUrl": "./",
+
+        "declaration": true,
+        "declarationMap": true,
+        "emitDeclarationOnly": false,
+        "removeComments": true,
+        "emitDecoratorMetadata": true,
+        "experimentalDecorators": true,
+        "resolveJsonModule": true,
+        "noEmitOnError": false,
+        "isolatedModules": true,
+        "verbatimModuleSyntax": true,
+        "strict": true,
+        "esModuleInterop": true,
+        "forceConsistentCasingInFileNames": true,
+        "sourceMap": true,
+        "skipLibCheck": true,
+        // "incremental": true,
+        // "noEmit": true,
+        // "allowImportingTsExtensions": true,
+    },
+    "exclude": [
+        "node_modules",
+        "test",
+        "dist",
+        "**/*spec.ts"
+    ],
+    "include": [
+        "src/**/*.ts",
+        "bin/*.ts",
+    ]
 }
