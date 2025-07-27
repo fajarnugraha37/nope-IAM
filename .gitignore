@@ -1,0 +1,25 @@
+# Node.js/TypeScript IAM-like Access Control Library
+# Ignore node_modules and build artifacts
+node_modules/
+dist/
+build/
+*.log
+*.tsbuildinfo
+.env
+.env.*
+# IDE/editor
+.vscode/
+.idea/
+.DS_Store
+*.swp
+*.swo
+# Jest
+jest-coverage/
+# OS
+Thumbs.db
+# Misc
+*.local
+*.cache
+# Ignore test output
+*.test-results.json
+.github
