@@ -1,7 +1,7 @@
 
 # NopeIAM
 
-[![Publish to npm](https://github.com/fajarnugraha37/nope-IAM/actions/workflows/publish.yml/badge.svg?branch=main)](https://github.com/fajarnugraha37/nope-IAM/actions/workflows/publish.yml)
+[![Publish to npm](https://github.com/fajarnugraha37/nope-IAM/actions/workflows/publish.yml/badge.svg)](https://github.com/fajarnugraha37/nope-IAM/actions/workflows/publish.yml)
 [![npm version](https://img.shields.io/npm/v/@fajarnugraha37/nope-iam.svg?style=flat-square)](https://www.npmjs.com/package/@fajarnugraha37/nope-iam)
 [![MIT License](https://img.shields.io/badge/license-MIT-green.svg?style=flat-square)](LICENSE)
 
