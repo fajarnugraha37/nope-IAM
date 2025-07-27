@@ -1,9 +1,18 @@
 {
-  "name": "vibecoding-iam",
+  "name": "@fajarnugraha37/nope-iam",
   "version": "0.1.0",
-  "description": "TypeScript IAM-like access control library for Node.js (AWS IAM inspired)",
+  "description": "A highly extensible, type-safe IAM-like access control library for Node.js, inspired by AWS IAM. Deny by default, allow by vibes and less patience for your bad access patterns. Supports policies, roles, decorators, adapters, and rich evaluation context because you probably need it.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/fajarnugraha37/nope-IAM.git"
+  },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
     "build": "tsc",
     "start": "node dist/examples/express-example.js",
@@ -13,12 +22,27 @@
   "keywords": [
     "iam",
     "access-control",
+    "access-management",
+    "permission",
+    "permission-management",
+    "rbac",
+    "abac",
     "typescript",
     "nodejs",
     "rbac",
-    "policy"
+    "policy",
+    "acl",
+    "statement",
+    "iam",
+    "authorization",
+    "decorators",
+    "express",
+    "nestjs",
+    "fastify",
+    "hono",
+    "serverless"
   ],
-  "author": "",
+  "author": "Fajar Nugraha <fajarnugraha37@gmail.com>",
   "license": "MIT",
   "dependencies": {
     "@nestjs/common": "^10.0.0",
