@@ -94,20 +94,23 @@ Here's a high-level overview:
 
 ---
 
+
 ## Installation
 ```sh
-npm install @fajarnugraha37/nope-IAM
+npm install @fajarnugraha37/nope-iam --save
 # or
-yarn add @fajarnugraha37/nope-IAM
+yarn add @fajarnugraha37/nope-iam
 # or
-pnpm add @fajarnugraha37/nope-IAM
+pnpm add @fajarnugraha37/nope-iam
 ```
+
+**NPM Package:** [@fajarnugraha37/nope-iam](https://www.npmjs.com/package/@fajarnugraha37/nope-iam)
 
 ---
 
 ## Quick Example
 ```ts
-import { IAM, InMemoryAdapter, defaultPolicyEvaluator } from '@fajarnugraha37/nope-IAM';
+import { IAM, InMemoryAdapter, defaultPolicyEvaluator } from '@fajarnugraha37/nope-iam';
 
 const policy = { id: 'p1', name: 'AllowRead', statements: [ { effect: 'Allow', actions: ['read'], resources: ['doc:1'] } ] };
 const role = { id: 'r1', name: 'reader', policyIds: ['p1'] };
