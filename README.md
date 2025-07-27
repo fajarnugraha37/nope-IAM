@@ -1,4 +1,5 @@
 
+
 # NopeIAM
 
 [![Publish to npm](https://github.com/fajarnugraha37/nope-IAM/actions/workflows/publish.yml/badge.svg)](https://github.com/fajarnugraha37/nope-IAM/actions/workflows/publish.yml)
@@ -64,7 +65,20 @@ Here's a high-level overview:
 
 ---
 
-## Architecture Overview
+## Project Journey
+
+This project has evolved through a series of improvements and real-world feedback. Key milestones include:
+
+- **2025-07-20:** Project scaffolding, initial TypeScript config, and in-memory adapter skeleton.
+- **2025-07-27:**
+  - Major refactor for type safety and extensibility.
+  - Added async/await and streaming support to adapters.
+  - Introduced comprehensive TSDoc comments and robust Jest unit tests.
+  - Implemented CI/CD with GitHub Actions for automated npm publishing.
+  - Fixed TypeScript ESM/declaration issues and Jest ESM compatibility.
+  - Added a detailed [CHANGELOG.md](CHANGELOG.md) for transparent release notes.
+
+See the [CHANGELOG.md](CHANGELOG.md) for a full history of changes, fixes, and planned features.
 
 ```
 +-------------------+         +-------------------+         +-------------------+
@@ -101,6 +115,8 @@ Here's a high-level overview:
 
 ---
 
+
+---
 
 ## Installation
 ```sh
@@ -157,6 +173,10 @@ console.log(result.decision); // true
 ## Publishing & Usage
 - MIT License
 - Ready for npm: includes type declarations, clean exports, and documentation
+- Automated publishing via GitHub Actions on tag and manual trigger ([see workflow](.github/workflows/publish.yml)).
+- TypeScript and Jest configuration are tuned for ESM and modern Node.js compatibility.
+
+---
 
 ---
 
@@ -195,6 +215,8 @@ console.log(result.decision); // true
 
 ---
 
+---
+
 ## Project Structure
 ```
 ├── src/
@@ -214,12 +236,17 @@ console.log(result.decision); // true
 
 ---
 
-## Contributing
+---
+
+## Contributing & Feedback
+We welcome PRs, issues, and suggestions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) if available. For questions or feedback, open an issue or contact the author directly.
 PRs and issues welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) if available.
 
 ---
 
-## Author
+---
+
+## Author & License
 Fajar Nugraha (<fajarnugraha37@gmail.com>)
 
 ---
