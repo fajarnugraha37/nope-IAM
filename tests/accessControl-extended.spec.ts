@@ -145,15 +145,7 @@ describe("AccessControl and related decorators", () => {
       }
     }
     const f = new Fail();
-    try {
-      await t.foo();
-    } catch (error) {
-      if (error instanceof Error) {
-        expect(error.message).toMatch(/condition failed/);
-      } else {
-        fail(error);
-      }
-    }
+    await expect(f.foo()).rejects.toThrow(/condition failed/);
   });
 
 
