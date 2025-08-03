@@ -55,6 +55,20 @@ describe('defaultPolicyEvaluator', () => {
     expect(result.trace.reason).toMatch(/No matching policy/);
   });
 
+  it('should not evaluate the same policy more than once', async () => {
+    const result = await evaluator(
+      user,
+      'delete',
+      'doc:1',
+      {},
+      [allowPolicy],
+      [role],
+      defaultConditionOperators
+    );
+    const occurrences = result.trace.checkedPolicies.filter((id) => id === 'p1');
+    expect(occurrences).toHaveLength(1);
+  });
+
   it('should deny when explicit deny policy matches', async () => {
     const result = await evaluator(
       user,
