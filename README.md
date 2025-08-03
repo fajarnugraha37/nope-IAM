@@ -19,7 +19,7 @@ Supports policies, roles, decorators, adapters, and rich evaluation context beca
 ## Features
 - **AWS IAM-inspired**: Users, roles, policies, statements, actions, resources, conditions, effects (allow/deny, mostly deny)
 - **TypeScript-first**: Strict types, generics, and type-safe APIs (because you can't be trusted)
-- **Pluggable storage**: In-memory, JSON file, and custom adapters for your ever-changing stack
+- **Pluggable storage**: In-memory, JSON/YAML file, and custom adapters for your ever-changing stack
 - **Asynchronous evaluation**: Promise-based, always
 - **Rich decision context**: Not just boolean, but evaluation trace, matched policy/statement, etc.
 - **Decorators**: For route/method-level access control, with parameterized and composable support (so you can blame the decorator)
@@ -183,7 +183,7 @@ console.log(result.decision); // true
 ## Project Roadmap
 - [x] **Core IAM Engine**: Type-safe, extensible, and async policy evaluation
 - [x] **Policy, Role, User Model**: AWS IAM-inspired, with flat roles and explicit policy attachment
-- [x] **In-Memory & JSON Adapters**: Pluggable storage, ready for custom and RDBMS adapters
+- [x] **In-Memory, JSON & YAML Adapters**: Pluggable storage, ready for custom and RDBMS adapters
 - [x] **Rich Decorator Suite**: `@AccessControl`, `@RequireRole`, `@RequirePolicy`, `@AllowActions`, `@DenyActions`, `@AccessCondition`, `@LogAccess`
 - [x] **Role Assignment Utilities**: Assign/unassign roles to users
 - [x] **Serialization**: Import/export for policies, roles, etc.
@@ -221,7 +221,7 @@ console.log(result.decision); // true
 ```
 ├── src/
 │   ├── core/           # IAM engine, evaluators, logger, storage
-│   ├── adapters/       # In-memory, JSON
+│   ├── adapters/       # In-memory, JSON, YAML
 │   ├── decorators/     # Access control decorators
 │   ├── types/          # Entities, decision context, etc.
 │   └── utils/          # Role assignment, serialization

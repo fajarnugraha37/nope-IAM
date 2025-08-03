@@ -5,6 +5,7 @@
 
 export * from "./adapters/inMemoryAdapter.js";
 export * from "./adapters/jsonFileAdapter.js";
+export * from "./adapters/yamlFileAdapter.js";
 
 export * from "./core/defaultEvaluator.js";
 export * from "./core/evaluator.js";
