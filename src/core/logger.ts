@@ -1,4 +1,7 @@
 import fs from "fs";
+import path from "path";
+import yaml from "js-yaml";
+import dotenv from "dotenv";
 
 /**
  * Logger interface for pluggable logging
@@ -95,26 +98,36 @@ export interface IAMConfig {
 export function loadIAMConfig(
   options?: { file?: string } | { env?: Record<string, unknown> }
 ): Partial<IAMConfig> {
-  // Minimal implementation: loads from process.env and optionally a JSON file
   const config: Partial<IAMConfig> = {};
   if (process.env.IAM_LOG_LEVEL) {
     config.logLevel = process.env.IAM_LOG_LEVEL as LogLevel;
   }
-  // Optionally load from file (JSON only for now)
+
   if (options) {
     if ("env" in options) {
       Object.assign(config, options.env);
     } else if ("file" in options) {
       try {
-        // eslint-disable-next-line @typescript-eslint/no-var-requires
-        if (fs.existsSync(options.file!)) {
-          const raw = fs.readFileSync(options.file!, "utf-8");
-          const parsed = JSON.parse(raw);
-          if (parsed.logLevel) config.logLevel = parsed.logLevel;
-          // Add more config parsing as needed
+        const filePath = options.file!;
+        if (fs.existsSync(filePath)) {
+          const ext = path.extname(filePath).toLowerCase();
+          const raw = fs.readFileSync(filePath, "utf-8");
+          let parsed: any;
+          if (ext === ".json") {
+            parsed = JSON.parse(raw);
+          } else if (ext === ".yaml" || ext === ".yml") {
+            parsed = yaml.load(raw);
+          } else if (ext === ".env") {
+            parsed = dotenv.parse(raw);
+          }
+          if (parsed) {
+            if (parsed.logLevel) config.logLevel = parsed.logLevel as LogLevel;
+            if (parsed.IAM_LOG_LEVEL) config.logLevel = parsed.IAM_LOG_LEVEL as LogLevel;
+            Object.assign(config, parsed);
+          }
         }
-      } catch (err) {
-        // Fallback: ignore file errors
+      } catch {
+        // Ignore file errors
       }
     }
   }
