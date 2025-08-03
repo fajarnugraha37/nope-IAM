@@ -31,15 +31,10 @@ export function defaultPolicyEvaluator(_logger: ILogger): PolicyEvaluator {
       resource,
       context,
     });
-    // Flatten all policies from user and roles
+    // Flatten policies and remove duplicates to avoid evaluating the same policy twice
+    // (e.g. a policy attached directly to the user and through a role)
     const allPolicies = [
-      ...policies,
-      ...roles.flatMap(
-        (r) =>
-          r.policyIds
-            .map((pid) => policies.find((p) => p.id === pid))
-            .filter(Boolean) as Policy[]
-      ),
+      ...new Map(policies.map((p) => [p.id, p])).values(),
     ];
     const trace: {
       checkedPolicies: string[];
