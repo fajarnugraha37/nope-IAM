@@ -139,10 +139,10 @@ export function AccessCondition(
 ): MethodDecorator {
   return (target, propertyKey, descriptor: PropertyDescriptor) => {
     const original = descriptor.value;
-    descriptor.value = function (this: any, ...args: any[]) {
+    descriptor.value = async function (this: any, ...args: any[]) {
       if (!condition(this.user, ...args))
         throw new Error("Access denied: condition failed");
-      return original.apply(this, args);
+      return await original.apply(this, args);
     };
     return descriptor;
   };
