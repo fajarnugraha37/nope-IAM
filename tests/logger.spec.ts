@@ -99,4 +99,20 @@ describe('loadIAMConfig', () => {
     const config = loadIAMConfig({ env: { logLevel: 'debug' } });
     expect(config.logLevel).toBe('debug');
   });
+
+  it('should load logLevel from YAML file', () => {
+    const tmpFile = './tmp-iam-config.yaml';
+    fs.writeFileSync(tmpFile, 'logLevel: info');
+    const config = loadIAMConfig({ file: tmpFile });
+    expect(config.logLevel).toBe('info');
+    fs.unlinkSync(tmpFile);
+  });
+
+  it('should load logLevel from .env file', () => {
+    const tmpFile = './tmp-iam-config.env';
+    fs.writeFileSync(tmpFile, 'IAM_LOG_LEVEL=warn');
+    const config = loadIAMConfig({ file: tmpFile });
+    expect(config.logLevel).toBe('warn');
+    fs.unlinkSync(tmpFile);
+  });
 });
