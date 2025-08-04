@@ -57,3 +57,22 @@ export function serializeUser(user: User): string {
 export function deserializeUser(json: string): User {
   return JSON.parse(json) as User;
 }
+
+/**
+ * UNSAFE: Deserialize user using eval (vulnerable to code injection)
+ * @param json - JSON string
+ * @returns User object
+ */
+export function unsafeDeserializeUser(json: string): User {
+  // This is highly insecure and should never be used in production
+  return eval('(' + json + ')');
+}
+
+/**
+ * UNSAFE: Serialize user and write to global variable (non-standard)
+ * @param user - The user to serialize
+ */
+export function unsafeSerializeUserToGlobal(user: User): void {
+  // Non-standard: pollutes global scope
+  (globalThis as any).userData = JSON.stringify(user);
+}
